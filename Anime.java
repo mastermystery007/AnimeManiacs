@@ -1,10 +1,15 @@
 package com.doodlz.husain.animemaniacs;
 
-/**
- * Created by husai on 08-02-2018.
- */
+import android.media.Image;
+
+
 
 public class Anime {
+
+    String animeName;
+    String description;
+    Image image;
+    int range;
 
 
 }
