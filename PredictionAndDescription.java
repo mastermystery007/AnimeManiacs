@@ -1,9 +1,18 @@
 package com.doodlz.husain.animemaniacs;
 
+import android.app.ProgressDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+
 public class PredictionAndDescription extends AppCompatActivity {
+
+    private DatabaseReference mDatabase;
+    private FirebaseAuth mFirebaseAuth;
+
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
