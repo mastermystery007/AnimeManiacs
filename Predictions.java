@@ -6,7 +6,7 @@ import java.sql.Time;
  * Created by husai on 08-02-2018.
  */
 
-public class Prediction {
+public class Predictions {
 
     String content;
     int upvotes,downvotes;

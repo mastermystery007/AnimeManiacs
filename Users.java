@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * Created by husai on 08-02-2018.
  */
 
-public class User {
+public class Users {
 
     String userName;
     String userID;

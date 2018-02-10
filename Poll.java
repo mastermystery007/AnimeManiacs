@@ -8,7 +8,7 @@ public class Poll {
 
     String question;
     String anime;
-    User user;
+    Users user;
     String option1;
     String option2;
     String option3;
