@@ -6,8 +6,8 @@ package com.doodlz.husain.animemaniacs;
 
 public class Poll {
 
-    String question;
-    String anime;
+    String poll_question;
+    String anime_name;
     Users user;
     String option1;
     String option2;

@@ -3,7 +3,7 @@ package com.doodlz.husain.animemaniacs;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class AnimeRange extends AppCompatActivity {
+public class AnimeRangeList extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
