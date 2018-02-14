@@ -8,34 +8,40 @@ import java.sql.Time;
 
 public class Predictions {
 
-    String pred_content;
-    int upvotes,downvotes;
+    String predictionContent;
+    String upvotes, downvotes;
     String userName;
     String anime;
-    Time time;
+    String time;
 
 
-    public String getPred_content() {
-        return pred_content;
+    public Predictions() {
     }
 
-    public void setPred_content(String pred_content) {
-        this.pred_content = pred_content;
+    public Predictions(String downvotes, String predictionContent, String time, String upvotes, String userName) {
     }
 
-    public int getUpvotes() {
+    public String getPredictionContent() {
+        return predictionContent;
+    }
+
+    public void setPredictionContent(String pred_content) {
+        this.predictionContent = pred_content;
+    }
+
+    public String getUpvotes() {
         return upvotes;
     }
 
-    public void setUpvotes(int upvotes) {
+    public void setUpvotes(String upvotes) {
         this.upvotes = upvotes;
     }
 
-    public int getDownvotes() {
+    public String getDownvotes() {
         return downvotes;
     }
 
-    public void setDownvotes(int downvotes) {
+    public void setDownvotes(String downvotes) {
         this.downvotes = downvotes;
     }
 
@@ -55,11 +61,11 @@ public class Predictions {
         this.anime = anime;
     }
 
-    public Time getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(Time time) {
+    public void setTime(String time) {
         this.time = time;
     }
 }

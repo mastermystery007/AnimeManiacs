@@ -4,16 +4,16 @@ import android.media.Image;
 
 
 
-public class Anime {
+public class Animes {
 
     private String animeName;
     private String description;
     private String image;
     private int range;
 
-    public Anime(){}
+    public Animes(){}
 
-    public Anime(String animeName, String description ,String image){
+    public Animes(String animeName, String description , String image){
 
         this.animeName=animeName;
         this.description=description;

@@ -32,20 +32,22 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
 
-        FirebaseRecyclerAdapter<Anime, AnimeViewHolder> FBRA = new FirebaseRecyclerAdapter<Anime, AnimeViewHolder>(
-                Anime.class,
-                R.layout.anime_card,
-                AnimeViewHolder.class,
-                mDatabase
-        ) {
-            @Override
-            protected void populateViewHolder(AnimeViewHolder viewHolder, Anime model, int position) {
+      FirebaseRecyclerAdapter<Animes,AnimeViewHolder> FBRA =new FirebaseRecyclerAdapter<Animes,AnimeViewHolder>(
 
-                viewHolder.setTitle(model.getAnimeName());
-                viewHolder.setDescription(model.getDescription());
+              Animes.class,
+              R.layout.anime_card,
+              AnimeViewHolder.class,
+              mDatabase
 
-            }
-        };
+      ) {
+
+          @Override
+          protected void populateViewHolder(AnimeViewHolder viewHolder, Animes model, int position) {
+
+              viewHolder.setTitle(model.getAnimeName());
+              viewHolder.setDescription(model.getDescription());
+          }
+      };
         mAnimeList.setAdapter(FBRA);
     }
 
