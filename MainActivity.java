@@ -1,5 +1,6 @@
 package com.doodlz.husain.animemaniacs;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,9 +23,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mAnimeList=(RecyclerView)findViewById(R.id.animeList);
-        mAnimeList.setHasFixedSize(true);
+
         mAnimeList.setLayoutManager(new LinearLayoutManager(this));
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Animes");
+
+
 
 
     }
@@ -46,9 +49,39 @@ public class MainActivity extends AppCompatActivity {
 
               viewHolder.setTitle(model.getAnimeName());
               viewHolder.setDescription(model.getDescription());
+              model.toString();
           }
       };
         mAnimeList.setAdapter(FBRA);
+
+
+    }
+
+    public void addPollbuttonClicked(View view) {
+
+        Intent i;
+        i = new Intent(getApplicationContext(),AddPoll.class);
+        startActivity(i);
+
+    }
+
+    public void viewPollbuttonClicked(View view) {
+        Intent i;
+        i = new Intent(getApplicationContext(),ViewPoll.class);
+        startActivity(i);
+
+    }
+
+    public void viewPredictionbuttonClicked(View view) {
+        Intent i;
+        i = new Intent(getApplicationContext(),PredictionViewer.class);
+        startActivity(i);
+    }
+
+    public void loginbuttonClicked(View view) {
+        Intent i;
+        i = new Intent(getApplicationContext(),Login.class);
+        startActivity(i);
     }
 
 

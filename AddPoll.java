@@ -15,14 +15,15 @@ public class AddPoll extends AppCompatActivity {
    private EditText pollQuestiontv,option1tv,option2tv,option3tv,option4tv;
    private Button addPollbutton;
    DatabaseReference sDatabaseReference;
-   String userName=null,animeName=null;
-   Users user;
+   String userName="Husain Mistry",animeName="Naruto";
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_poll);
+
         pollQuestiontv=(EditText)findViewById(R.id.pollQuestion);
         option1tv=(EditText)findViewById(R.id.option1);
         option2tv=(EditText)findViewById(R.id.option2);
@@ -30,8 +31,9 @@ public class AddPoll extends AppCompatActivity {
         option4tv=(EditText)findViewById(R.id.option4);
         addPollbutton=(Button)findViewById(R.id.addPoll);
         sFirebaseDatabase=FirebaseDatabase.getInstance();
+        sDatabaseReference=sFirebaseDatabase.getReference("Poll");
 
-        userName=user.getUserName();
+
     }
 
     public void addPollClicked(View view) {
@@ -42,6 +44,6 @@ public class AddPoll extends AppCompatActivity {
         String option4= option4tv.getText().toString().trim();
 
         Poll userPoll=new Poll(pollQuestion,animeName,userName,option1,option2,option3,option4,0,0,0,0);
-
+        sDatabaseReference.push().setValue(userPoll);
     }
 }

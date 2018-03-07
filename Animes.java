@@ -1,7 +1,7 @@
 package com.doodlz.husain.animemaniacs;
 
 import android.media.Image;
-
+import android.util.Log;
 
 
 public class Animes {
@@ -50,5 +50,10 @@ public class Animes {
 
     public void setRange(int range) {
         this.range = range;
+    }
+
+    public void inString(Animes anime){
+        Log.d("title", "inString: "+anime.getAnimeName());
+        Log.d("desc", "inString: "+anime.getDescription());
     }
 }

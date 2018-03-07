@@ -9,39 +9,42 @@ import java.sql.Time;
 public class Predictions {
 
     String predictionContent;
-    String upvotes, downvotes;
+    int upvotes, downvotes;
     String userName;
     String anime;
-    String time;
 
 
-    public Predictions() {
-    }
+    public Predictions() {}
 
-    public Predictions(String downvotes, String predictionContent, String time, String upvotes, String userName) {
+
+    public Predictions(int downvotes,String predictionContent, int upvotes, String userName) {
+        this.downvotes=downvotes;
+        this.upvotes=upvotes;
+        this.predictionContent=predictionContent;
+        this.userName=userName;
     }
 
     public String getPredictionContent() {
         return predictionContent;
     }
 
-    public void setPredictionContent(String pred_content) {
-        this.predictionContent = pred_content;
+    public void setPredictionContent(String predictionContent) {
+        this.predictionContent = predictionContent;
     }
 
-    public String getUpvotes() {
+    public int getUpvotes() {
         return upvotes;
     }
 
-    public void setUpvotes(String upvotes) {
+    public void setUpvotes(int upvotes) {
         this.upvotes = upvotes;
     }
 
-    public String getDownvotes() {
+    public int getDownvotes() {
         return downvotes;
     }
 
-    public void setDownvotes(String downvotes) {
+    public void setDownvotes(int downvotes) {
         this.downvotes = downvotes;
     }
 
@@ -53,19 +56,18 @@ public class Predictions {
         this.userName = userName;
     }
 
-    public String getAnime() {
-        return anime;
-    }
+    public String getAnime() {return anime;}
+
 
     public void setAnime(String anime) {
         this.anime = anime;
     }
 
-    public String getTime() {
-        return time;
+
+
+    public String showData(){
+        return this.predictionContent+" "+this.upvotes+" "+this.downvotes+" "+this.userName;
+
     }
 
-    public void setTime(String time) {
-        this.time = time;
-    }
 }

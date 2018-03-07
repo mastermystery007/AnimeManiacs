@@ -6,42 +6,43 @@ import java.util.ArrayList;
  * Created by husai on 08-02-2018.
  */
 
-public class Users {
+public  class Users {
 
-    private String userName;
-    private String userID;
-    private String bio;
-    private int profilePicture;
+
+    private static String userName;
+    private static String userID;
+    private static String bio;
+    private static int profilePicture;
 
     public  String getUserName() {
         return userName;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public static void setUserName(String userName) {
+        userName = userName;
     }
 
-    public String getUserID() {
+    public static String getUserID() {
         return userID;
     }
 
-    public void setUserID(String userID) {
-        this.userID = userID;
+    public static void setUserID(String userID) {
+        userID = userID;
     }
 
-    public String getBio() {
+    public static String getBio() {
         return bio;
     }
 
-    public void setBio(String bio) {
-        this.bio = bio;
+    public static void setBio(String bio) {
+        bio = bio;
     }
 
-    public int getProfilePicture() {
+    public static int getProfilePicture() {
         return profilePicture;
     }
 
-    public void setProfilePicture(int profilePicture) {
-        this.profilePicture = profilePicture;
+    public static void setProfilePicture(int profilePicture) {
+        profilePicture = profilePicture;
     }
 }

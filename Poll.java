@@ -89,35 +89,36 @@ public class Poll {
         this.option4 = option4;
     }
 
-    public int getOp1Score() {
+
+    public int getOp1votes() {
         return op1votes;
     }
 
-    public void setOp1Score(int op1Score) {
-        this.op1votes = op1Score;
+    public void setOp1votes(int op1votes) {
+        this.op1votes = op1votes;
     }
 
-    public int getOp2Score() {
+    public int getOp2votes() {
         return op2votes;
     }
 
-    public void setOp2Score(int op2Score) {
-        this.op2votes = op2Score;
+    public void setOp2votes(int op2votes) {
+        this.op2votes = op2votes;
     }
 
-    public int getOp3Score() {
+    public int getOp3votes() {
         return op3votes;
     }
 
-    public void setOp3Score(int op3Score) {
-        this.op3votes = op3Score;
+    public void setOp3votes(int op3votes) {
+        this.op3votes = op3votes;
     }
 
-    public int getOp4Score() {
+    public int getOp4votes() {
         return op4votes;
     }
 
-    public void setOp4Score(int op4Score) {
-        this.op4votes = op4Score;
+    public void setOp4votes(int op4votes) {
+        this.op4votes = op4votes;
     }
 }
