@@ -20,9 +20,10 @@ public class PredictionViewer extends AppCompatActivity {
     private RecyclerView pPredictionList;
     private FirebaseDatabase uFirebaseDatabase;
     private DatabaseReference pDatabase;
-    String anime="Naruto";
-    String range="0-30";
+    private String anime;
+    private String range;
     Button submitpredButton;
+
     EditText predText;
     String userName="Husain";
 
@@ -30,6 +31,9 @@ public class PredictionViewer extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_prediction_viewer);
+
+        anime = getIntent().getExtras().getString("anime_name_key");
+        range = getIntent().getExtras().getString("chapter_range_key");
 
         //initialization
         pPredictionList=(RecyclerView) findViewById(R.id.predictionLayout);
@@ -40,7 +44,7 @@ public class PredictionViewer extends AppCompatActivity {
         predText = (EditText)findViewById(R.id.predictionet) ;
 
         uFirebaseDatabase = FirebaseDatabase.getInstance();
-        pDatabase = uFirebaseDatabase.getReference().child("Predictions").child("Naruto").child(range);
+        pDatabase = uFirebaseDatabase.getReference().child("Predictions").child(anime).child(range);
 
     }
 
@@ -65,7 +69,7 @@ public class PredictionViewer extends AppCompatActivity {
                 viewHolder.setUpvotes(model.getDownvotes());
                 viewHolder.setDownvotes(model.getDownvotes());
 
-                Log.d("godHusain", model.showData());
+
 
             }
         };
@@ -77,7 +81,7 @@ public class PredictionViewer extends AppCompatActivity {
             public void onClick(View v) {
                 String predictionContent = predText.getText().toString();
                 Predictions predictions = new Predictions(0,predictionContent,0,"Husain Mistry");
-                FirebaseDatabase.getInstance().getReference("Predictions").child("Naruto").child(range).push().setValue(predictions);
+                FirebaseDatabase.getInstance().getReference("Predictions").child(anime).child(range).push().setValue(predictions);
             }
         });
     }

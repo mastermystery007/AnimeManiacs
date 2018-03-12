@@ -5,8 +5,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
@@ -32,29 +34,39 @@ public class MainActivity extends AppCompatActivity {
 
     }
     public void onStart(){
+
         super.onStart();
 
 
       FirebaseRecyclerAdapter<Animes,AnimeViewHolder> FBRA =new FirebaseRecyclerAdapter<Animes,AnimeViewHolder>(
-
               Animes.class,
               R.layout.anime_card,
               AnimeViewHolder.class,
               mDatabase
-
       ) {
 
           @Override
           protected void populateViewHolder(AnimeViewHolder viewHolder, Animes model, int position) {
 
+             final String poll_key = getRef(position).getKey();
               viewHolder.setTitle(model.getAnimeName());
               viewHolder.setDescription(model.getDescription());
-              model.toString();
+              model.inString(model);
+
+              viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                  @Override
+                  public void onClick(View v) {
+
+                 Intent intent = new Intent(MainActivity.this,AnimeRangeList.class);
+                 intent.putExtra("anime_name_key",poll_key);
+                  startActivity(intent);
+
+                  }
+              });
           }
       };
+
         mAnimeList.setAdapter(FBRA);
-
-
     }
 
     public void addPollbuttonClicked(View view) {
@@ -69,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
         Intent i;
         i = new Intent(getApplicationContext(),ViewPoll.class);
         startActivity(i);
-
     }
 
     public void viewPredictionbuttonClicked(View view) {
@@ -81,6 +92,12 @@ public class MainActivity extends AppCompatActivity {
     public void loginbuttonClicked(View view) {
         Intent i;
         i = new Intent(getApplicationContext(),Login.class);
+        startActivity(i);
+    }
+
+    public void descriptionbuttonClicked(View view) {
+        Intent i;
+        i = new Intent(getApplicationContext(),DescriptionViewer.class);
         startActivity(i);
     }
 
