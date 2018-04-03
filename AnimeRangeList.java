@@ -51,7 +51,7 @@ public class AnimeRangeList extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
 
-                        Intent intent = new Intent(AnimeRangeList.this,PredictionViewer.class);
+                        Intent intent = new Intent(AnimeRangeList.this,PredDescViewer.class);
                         intent.putExtra("anime_name_key",anime_name);
                         intent.putExtra("chapter_range_key",range_key);
                         startActivity(intent);

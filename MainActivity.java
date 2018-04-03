@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(i);
     }
 
-    public void viewPredictionbuttonClicked(View view) {
+    public void viewPredictionDescriptionbuttonClicked(View view) {
         Intent i;
         i = new Intent(getApplicationContext(),PredictionViewer.class);
         startActivity(i);

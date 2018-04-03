@@ -16,8 +16,8 @@ public class PredDescViewer extends AppCompatActivity {
     private String chapterRange;
     Bundle bundle;
     FragmentManager fm = getSupportFragmentManager();
-    PredictionViewer predFragment = new PredictionViewer();
-    DescriptionViewer descFragment = new DescriptionViewer();
+
+
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -30,8 +30,8 @@ public class PredDescViewer extends AppCompatActivity {
                 case R.id.prediction:
                     setTitle("Predictions");
 
-                    predFragment.setArguments(bundle);
-                    fm.beginTransaction().replace(R.id.container,predFragment).commit();
+                    PredictionViewer.getInstance().setArguments(bundle);
+                    fm.beginTransaction().replace(R.id.container,PredictionViewer.getInstance()).commit();
 
                     return true;
 
@@ -40,8 +40,8 @@ public class PredDescViewer extends AppCompatActivity {
 
 
 
-                    descFragment.setArguments(bundle);
-                    fm.beginTransaction().replace(R.id.container,descFragment).commit();
+                    DescriptionViewer.getInstance().setArguments(bundle);
+                    fm.beginTransaction().replace(R.id.container,DescriptionViewer.getInstance()).commit();
                     return true;}
 
                     return false;
@@ -63,8 +63,8 @@ public class PredDescViewer extends AppCompatActivity {
 
         setTitle("Predictions");
 
-        predFragment.setArguments(bundle);
-        fm.beginTransaction().replace(R.id.container,predFragment).commit();
+        PredictionViewer.getInstance().setArguments(bundle);
+        fm.beginTransaction().replace(R.id.container,PredictionViewer.getInstance()).commit();
 
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);

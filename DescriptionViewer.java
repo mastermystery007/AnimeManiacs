@@ -1,43 +1,106 @@
 package com.doodlz.husain.animemaniacs;
 
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
+
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class DescriptionViewer extends AppCompatActivity {
+import static com.doodlz.husain.animemaniacs.PredictionViewer.instance;
+
+public class DescriptionViewer extends Fragment {
 
     private RecyclerView descriptionViewerRV;
     private FirebaseDatabase uFirebaseDatabase;
     private DatabaseReference pDatabase;
-    private String anime="Naruto";
-    private String range="0-30";
+    private String anime;
+    private String range;
+
+    Button submitDescriptionButton;
+    EditText descText;
 
     String userName="Husain";
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_description_viewer);
+    static  DescriptionViewer instance;
 
-        descriptionViewerRV=(RecyclerView)findViewById(R.id.descriptionViewer);
+
+    public static DescriptionViewer getInstance() {
+        if (instance == null) {
+            instance = new DescriptionViewer();
+        }
+        return instance;
+    }
+
+    public DescriptionViewer(){}
+
+
+
+    @Override
+    public  View onCreateView(LayoutInflater inflator , ViewGroup container,Bundle savedInstanceState) {
+
+        View view = inflator.inflate(R.layout.activity_description_viewer, container, false);
+
+        descriptionViewerRV = (RecyclerView) view.findViewById(R.id.descriptionViewer);
         descriptionViewerRV.setHasFixedSize(true);
-        descriptionViewerRV.setLayoutManager(new LinearLayoutManager(this));
+
+
+
+
+        LinearLayoutManager lineaerLayoutManager = new LinearLayoutManager(getActivity());
+        descriptionViewerRV.setLayoutManager(lineaerLayoutManager);
+
+
+
+
+
+        return view;
+
+    }
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+
+        savedInstanceState=getArguments();
+
+        anime = savedInstanceState.getString("anime_name_key");
+        range = savedInstanceState.getString("chapter_range_key");
 
         uFirebaseDatabase = FirebaseDatabase.getInstance();
         pDatabase = uFirebaseDatabase.getReference().child("Description").child(anime).child(range);
+        submitDescriptionButton=(Button)getActivity().findViewById(R.id.submitBTN);
+        descText=(EditText)getActivity().findViewById(R.id.commentET);
 
 
+        submitDescriptionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String descContent=descText.getText().toString().trim();
+                Description prediction=new Description(descContent,0,0,userName,anime);
+                pDatabase.push().setValue(prediction);
+
+                descText.setText("");
+            }
+        });
+
+
+        Log.d("descViewer",""+anime);
+        Log.d("descViewer",""+range);
 
     }
     public void onStart(){
@@ -51,6 +114,7 @@ public class DescriptionViewer extends AppCompatActivity {
                 DescriptionViewHolder.class,
                 pDatabase
 
+
         ) {
 
             @Override
@@ -61,6 +125,23 @@ public class DescriptionViewer extends AppCompatActivity {
                 viewHolder.setUpvotes(model.getDownvotes());
                 viewHolder.setDownvotes(model.getDownvotes());
                 viewHolder.setUserName(model.getUserName());
+
+                viewHolder.dupvote.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //TODO
+                        // implement upvote functionality
+
+                    }
+                });
+
+                viewHolder.ddownvote.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //TODO
+                        // implement downvote functionality
+                    }
+                });
 
 
             }
@@ -76,10 +157,14 @@ public class DescriptionViewer extends AppCompatActivity {
     public static class DescriptionViewHolder extends RecyclerView.ViewHolder{
 
         View mView;
+        Button dupvote;
+        Button ddownvote;
 
         public DescriptionViewHolder(View itemView) {
             super(itemView);
             mView=itemView;
+             dupvote=(Button)mView.findViewById(R.id.dupvote);
+             ddownvote=(Button)mView.findViewById(R.id.ddownvote);
         }
         public void setDescriptionContent(String descriptionContent) {
             TextView descriptionContentTV= (TextView) mView.findViewById(R.id.ddescriptionContent);
