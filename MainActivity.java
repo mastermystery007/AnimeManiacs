@@ -1,5 +1,6 @@
 package com.doodlz.husain.animemaniacs;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -7,17 +8,21 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView mAnimeList;
     private DatabaseReference mDatabase;
+    private StorageReference mStorage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,9 +33,6 @@ public class MainActivity extends AppCompatActivity {
 
         mAnimeList.setLayoutManager(new LinearLayoutManager(this));
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Animes");
-
-
-
 
     }
     public void onStart(){
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
               R.layout.anime_card,
               AnimeViewHolder.class,
               mDatabase
+
       ) {
 
           @Override
@@ -51,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
              final String poll_key = getRef(position).getKey();
               viewHolder.setTitle(model.getAnimeName());
               viewHolder.setDescription(model.getDescription());
+              viewHolder.setImage(model.getImage());
               model.inString(model);
 
               viewHolder.mView.setOnClickListener(new View.OnClickListener() {
@@ -69,37 +73,13 @@ public class MainActivity extends AppCompatActivity {
         mAnimeList.setAdapter(FBRA);
     }
 
-    public void addPollbuttonClicked(View view) {
 
-        Intent i;
-        i = new Intent(getApplicationContext(),AddPoll.class);
-        startActivity(i);
 
-    }
 
-    public void viewPollbuttonClicked(View view) {
-        Intent i;
-        i = new Intent(getApplicationContext(),ViewPoll.class);
-        startActivity(i);
-    }
 
-    public void viewPredictionDescriptionbuttonClicked(View view) {
-        Intent i;
-        i = new Intent(getApplicationContext(),PredictionViewer.class);
-        startActivity(i);
-    }
 
-    public void loginbuttonClicked(View view) {
-        Intent i;
-        i = new Intent(getApplicationContext(),Login.class);
-        startActivity(i);
-    }
 
-    public void descriptionbuttonClicked(View view) {
-        Intent i;
-        i = new Intent(getApplicationContext(),DescriptionViewer.class);
-        startActivity(i);
-    }
+
 
 
     public static class AnimeViewHolder extends RecyclerView.ViewHolder{
@@ -119,6 +99,12 @@ public class MainActivity extends AppCompatActivity {
         public void setDescription(String description){
             TextView anime_title=(TextView)mView.findViewById(R.id.animeDescription);
             anime_title.setText(description);
+        }
+
+        public void setImage(String image){
+            ImageView anime_image=(ImageView)mView.findViewById(R.id.animeImage);
+            Picasso.get().load(image).into(anime_image);
+
         }
     }
 }

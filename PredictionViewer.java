@@ -14,21 +14,30 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 
 
-public class PredictionViewer extends Fragment {
+public class PredictionViewer extends Fragment implements Opinion {
 
     private RecyclerView pPredictionList;
-    private FirebaseDatabase uFirebaseDatabase;
-    private DatabaseReference pDatabase;
+
+    private DatabaseReference pDatabase,likedDatabase,userDatabase;
     private String anime;
     private String range;
     Button submitpredButton;
+
 
     EditText predText;
     String userName="Husain";
@@ -52,11 +61,11 @@ public class PredictionViewer extends Fragment {
 
 
         //initialization
-        pPredictionList = (RecyclerView) view.findViewById(R.id.predictionLayout);
+        pPredictionList = view.findViewById(R.id.predictionLayout);
 
 
-        LinearLayoutManager lineaerLayoutManager = new LinearLayoutManager(getActivity());
-        pPredictionList.setLayoutManager(lineaerLayoutManager);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        pPredictionList.setLayoutManager(linearLayoutManager);
         pPredictionList.setHasFixedSize(true);
 
 
@@ -74,21 +83,30 @@ public class PredictionViewer extends Fragment {
 
             anime = savedInstanceState.getString("anime_name_key");
             range = savedInstanceState.getString("chapter_range_key");
+
         Log.d("predictionViewer",""+anime);
         Log.d("predictionViewer",""+range);
-        submitpredButton=(Button) getActivity().findViewById(R.id.submitBTN);
-        predText=(EditText) getActivity().findViewById(R.id.commentET);
-        uFirebaseDatabase = FirebaseDatabase.getInstance();
-        pDatabase = uFirebaseDatabase.getReference().child("Predictions").child(anime).child(range);
+
+        submitpredButton= getActivity().findViewById(R.id.submitBTN);
+        predText= getActivity().findViewById(R.id.commentET);
+
+        pDatabase = FirebaseDatabase.getInstance().getReference().child("Predictions").child(anime).child(range);
+
+        likedDatabase=FirebaseDatabase.getInstance().getReference().child("LikedUsers").child("PredictionUsers");
+
+        userDatabase=FirebaseDatabase.getInstance().getReference().child("Users");
 
 
         submitpredButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
 
                 String predContent=predText.getText().toString().trim();
                 Predictions prediction=new Predictions(0,predContent,0,userName);
                 pDatabase.push().setValue(prediction);
+                String userID= FirebaseAuth.getInstance().getCurrentUser().getUid().toString();
+                userDatabase.child(userID).setValue("prediction");
 
                 predText.setText("");
             }
@@ -111,32 +129,122 @@ public class PredictionViewer extends Fragment {
 
         ) {
 
-            @Override
-            protected void populateViewHolder(PredictionViewHolder viewHolder, Predictions model, int position) {
+           @Override
+           public void onBindViewHolder(PredictionViewHolder viewHolder, int position) {
+               super.onBindViewHolder(viewHolder, position);
+           }
+
+
+           @Override
+            protected void populateViewHolder(final PredictionViewHolder viewHolder, final Predictions model, int position) {
+
+                final String post_key = getRef(position).getKey();
 
                 viewHolder.setPredictionContent(model.getPredictionContent());
                 viewHolder.setUserName(model.getUserName());
-                viewHolder.setUpvotes(model.getDownvotes());
-                viewHolder.setDownvotes(model.getDownvotes());
+                viewHolder.setUpvotes(model.getUpvotes());
+                viewHolder.setLikeButton(post_key);
+
+                Log.d("PredViewer"," "+model.showData());
 
                 viewHolder.pUpvote.setOnClickListener(new View.OnClickListener() {
+                    boolean shouldKeepProcessing1=false;
+                    boolean shouldKeepProcessing2= false;
+                    boolean jobIsFinished=false;
+                    int realUpvotesInt;
+
+
+                    int numUpvotesint;
+
                     @Override
                     public void onClick(View v) {
-                        //  TODO
-                        // implement functionality
+
+                        viewHolder.pUpvote.setEnabled(false);
+                        shouldKeepProcessing1=true;
+                        shouldKeepProcessing2=true;
+
+
+
+
+                        pDatabase.addValueEventListener(new ValueEventListener() {
+
+
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if(shouldKeepProcessing2){
+                                  String realUpvotes= dataSnapshot.child(post_key).child("upvotes").getValue().toString();
+                                  realUpvotesInt=Integer.parseInt(realUpvotes);
+                                  shouldKeepProcessing2=false;
+                                  jobIsFinished=true;
+                                    Log.d("PredViewer"," data has changed");
+                                }
+                            }
+
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+
+                        likedDatabase.addValueEventListener(new ValueEventListener() {
+                         @Override
+                         public void onDataChange(DataSnapshot dataSnapshot) {
+                             if (shouldKeepProcessing1 && jobIsFinished) {
+                                 if ( dataSnapshot.child(post_key).hasChild(userName)) {
+
+                                     viewHolder.pUpvote.setImageResource(R.drawable.whitethumb);
+                                     likedDatabase.child(post_key).child(userName).removeValue();
+
+
+
+                                     numUpvotesint=realUpvotesInt-1;
+                                     viewHolder.setUpvotes(numUpvotesint);
+                                     pDatabase.child(post_key).child("upvotes").setValue(numUpvotesint);
+
+
+                                     viewHolder.pUpvote.setEnabled(true);
+                                     shouldKeepProcessing1=false;
+                                     jobIsFinished=false;
+
+                                     Log.d("PredViewer"," data changed");
+
+
+                                 }
+                                 else {
+
+                                     likedDatabase.child(post_key).child(userName).setValue("liked");
+
+
+                                     viewHolder.pUpvote.setImageResource(R.drawable.redthumb);
+
+                                     numUpvotesint= realUpvotesInt + 1;
+                                     viewHolder.setUpvotes(numUpvotesint);
+
+                                     pDatabase.child(post_key).child("upvotes").setValue(numUpvotesint);
+                                     shouldKeepProcessing1=false;
+
+
+                                     viewHolder.pUpvote.setEnabled(true);
+                                     jobIsFinished=false;
+
+                                     Log.d("PredViewer"," data changed");
+
+                                 }
+
+                             }
+                         }
+
+                         @Override
+                         public void onCancelled(DatabaseError databaseError) {
+
+                             viewHolder.pUpvote.setEnabled(true);
+                         }
+                     });
+
+
                     }
                 });
-
-                viewHolder.pDownvote.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // TODO
-                        // implement functionality
-                    }
-                });
-
-
-
             }
         };
 
@@ -160,30 +268,57 @@ public class PredictionViewer extends Fragment {
     public static class PredictionViewHolder extends RecyclerView.ViewHolder{
 
         View mView;
-        Button pUpvote;
-        Button pDownvote;
+        ImageButton pUpvote;
+        DatabaseReference likeDBR;
+
+        TextView upvotestv;
+        TextView predictionContenttv;
+        TextView usernametv;
+        String userName="Husain";
 
         public PredictionViewHolder(View itemView) {
             super(itemView);
             mView=itemView;
-            pUpvote=(Button)mView.findViewById(R.id.pupvote);
-            pDownvote=(Button)mView.findViewById(R.id.pdownvote);
+
+            pUpvote= mView.findViewById(R.id.pupvote);
+
+            upvotestv= mView.findViewById(R.id.numOfUpvotes);
+            predictionContenttv= mView.findViewById(R.id.predictionContent);
+
+            usernametv= mView.findViewById(R.id.username);
         }
         public void setPredictionContent(String predictionContent) {
-            TextView predictionContenttv= (TextView) mView.findViewById(R.id.predictionContent);
             predictionContenttv.setText(predictionContent);
         }
         public void setUpvotes(int upvotes) {
-            TextView upvotestv= (TextView)mView.findViewById(R.id.numOfUpvotes);
             upvotestv.setText(String.valueOf(upvotes));
+            Log.d("upvotes",String.valueOf(upvotes));
         }
-        public void setDownvotes(int downvotes) {
-            TextView downvotestvab=(TextView)mView.findViewById(R.id.numOfDownvotes);
-            downvotestvab.setText(String.valueOf(downvotes));
-        }
+
         public void setUserName(String username) {
-            TextView usernametv=(TextView)mView.findViewById(R.id.username);
             usernametv.setText(username);
+        }
+
+        public void setLikeButton(final String post_key){
+            likeDBR=FirebaseDatabase.getInstance().getReference().child("LikedUsers").child("PredictionUsers");
+            likeDBR.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.child(post_key).hasChild(userName)){
+                        pUpvote.setImageResource(R.drawable.redthumb);
+
+
+                    }else {pUpvote.setImageResource(R.drawable.whitethumb);}
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+
+
         }
 
     }

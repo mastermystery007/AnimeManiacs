@@ -1,6 +1,9 @@
 package com.doodlz.husain.animemaniacs;
 
-import java.util.ArrayList;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 
 /**
  * Created by husai on 08-02-2018.
@@ -9,10 +12,46 @@ import java.util.ArrayList;
 public  class Users {
 
 
+
+
     private static String userName;
-    private static String userID;
     private static String bio;
-    private static int profilePicture;
+    private static String profilePicture;
+    private static  String emailID;
+
+
+    private DatabaseReference userDBR=FirebaseDatabase.getInstance().getReference().child("Users");
+
+
+
+
+
+
+    public Users(String firebaseUserId) {
+
+        this.setUserName(userDBR.child(firebaseUserId).child("userName").toString());
+        this.setBio(userDBR.child(firebaseUserId).child("bio").toString());
+        this.setProfilePicture(userDBR.child(firebaseUserId).child("userName").toString());
+
+    }
+
+    public Users(String userName,String bio,String profilePicture,String emailID){
+        this.setUserName(userName);
+        this.setProfilePicture(profilePicture);
+        this.setBio(bio);
+        this.setEmailID(emailID);
+    }
+
+
+    public Users(){}
+
+    public static String getEmailID() {
+        return emailID;
+    }
+
+    public static void setEmailID(String emailID) {
+        Users.emailID = emailID;
+    }
 
     public  String getUserName() {
         return userName;
@@ -22,27 +61,23 @@ public  class Users {
         userName = userName;
     }
 
-    public static String getUserID() {
-        return userID;
-    }
 
-    public static void setUserID(String userID) {
-        userID = userID;
-    }
+
 
     public static String getBio() {
         return bio;
     }
 
-    public static void setBio(String bio) {
-        bio = bio;
-    }
+    public static void setBio(String bio) {bio = bio;}
 
-    public static int getProfilePicture() {
+
+
+
+    public static String getProfilePicture() {
         return profilePicture;
     }
 
-    public static void setProfilePicture(int profilePicture) {
+    public static void setProfilePicture(String profilePicture) {
         profilePicture = profilePicture;
     }
 }

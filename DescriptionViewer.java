@@ -13,21 +13,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import static com.doodlz.husain.animemaniacs.PredictionViewer.instance;
 
-public class DescriptionViewer extends Fragment {
+public class DescriptionViewer extends Fragment implements Opinion {
 
     private RecyclerView descriptionViewerRV;
-    private FirebaseDatabase uFirebaseDatabase;
-    private DatabaseReference pDatabase;
+
+    private DatabaseReference dDatabase,likedDatabase,userDatabase;
     private String anime;
     private String range;
+    private FirebaseUser firebaseUser;
 
     Button submitDescriptionButton;
     EditText descText;
@@ -81,10 +88,16 @@ public class DescriptionViewer extends Fragment {
         anime = savedInstanceState.getString("anime_name_key");
         range = savedInstanceState.getString("chapter_range_key");
 
-        uFirebaseDatabase = FirebaseDatabase.getInstance();
-        pDatabase = uFirebaseDatabase.getReference().child("Description").child(anime).child(range);
+
+        dDatabase = FirebaseDatabase.getInstance().getReference().child("Description").child(anime).child(range);
+
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         submitDescriptionButton=(Button)getActivity().findViewById(R.id.submitBTN);
         descText=(EditText)getActivity().findViewById(R.id.commentET);
+
+        likedDatabase=FirebaseDatabase.getInstance().getReference().child("LikedUsers").child("DescriptionUsers");
+
+        userDatabase=FirebaseDatabase.getInstance().getReference().child("Users");
 
 
         submitDescriptionButton.setOnClickListener(new View.OnClickListener() {
@@ -92,7 +105,10 @@ public class DescriptionViewer extends Fragment {
             public void onClick(View v) {
                 String descContent=descText.getText().toString().trim();
                 Description prediction=new Description(descContent,0,0,userName,anime);
-                pDatabase.push().setValue(prediction);
+                dDatabase.push().setValue(prediction);
+
+                String userID= FirebaseAuth.getInstance().getCurrentUser().getUid().toString();
+                userDatabase.child(userID).setValue("prediction");
 
                 descText.setText("");
             }
@@ -112,36 +128,115 @@ public class DescriptionViewer extends Fragment {
                 Description.class,
                 R.layout.description_overlay,
                 DescriptionViewHolder.class,
-                pDatabase
+                dDatabase
 
 
         ) {
 
             @Override
-            protected void populateViewHolder(DescriptionViewHolder viewHolder, Description model, int position) {
+            protected void populateViewHolder(final DescriptionViewHolder viewHolder, Description model, int position) {
 
+                final String post_key = getRef(position).getKey();
                 viewHolder.setDescriptionContent(model.getDescriptionContent());
                 Log.d("descriptionContent","descriptionContent"+model.getDescriptionContent());
-                viewHolder.setUpvotes(model.getDownvotes());
-                viewHolder.setDownvotes(model.getDownvotes());
+                viewHolder.setUpvotes(model.getUpvotes());
+                viewHolder.setLikeButton(post_key);
+
                 viewHolder.setUserName(model.getUserName());
 
                 viewHolder.dupvote.setOnClickListener(new View.OnClickListener() {
+
+                    boolean shouldKeepProcessing1=false;
+                    boolean shouldKeepProcessing2=false;
+                    boolean jobIsFinished=false;
+
+                    int realUpvotesInt;
+
+
+                    int numUpvotesint;
+
                     @Override
                     public void onClick(View v) {
-                        //TODO
-                        // implement upvote functionality
+
+                        viewHolder.dupvote.setEnabled(false);
+                        shouldKeepProcessing1=true;
+                        shouldKeepProcessing2=true;
+
+
+
+                        dDatabase.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if(shouldKeepProcessing2){
+                                    String realUpvotes= dataSnapshot.child(post_key).child("upvotes").getValue().toString();
+                                    realUpvotesInt=Integer.parseInt(realUpvotes);
+                                    shouldKeepProcessing2=false;
+                                    jobIsFinished=true;
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+
+                        likedDatabase.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (shouldKeepProcessing1 && jobIsFinished) {
+                                    if ( dataSnapshot.child(post_key).hasChild(userName)) {
+
+                                        viewHolder.dupvote.setImageResource(R.drawable.whitethumb);
+                                        likedDatabase.child(post_key).child(userName).removeValue();
+
+
+
+                                        numUpvotesint=realUpvotesInt-1;
+                                        viewHolder.setUpvotes(numUpvotesint);
+                                        dDatabase.child(post_key).child("upvotes").setValue(numUpvotesint);
+
+
+                                        viewHolder.dupvote.setEnabled(true);
+                                        shouldKeepProcessing1=false;
+                                        jobIsFinished=false;
+
+
+                                    }
+                                    else {
+
+                                        likedDatabase.child(post_key).child(userName).setValue("liked");
+
+
+                                        viewHolder.dupvote.setImageResource(R.drawable.redthumb);
+
+                                        numUpvotesint=(int)realUpvotesInt + 1;
+                                        viewHolder.setUpvotes(numUpvotesint);
+
+                                        dDatabase.child(post_key).child("upvotes").setValue(numUpvotesint);
+                                        shouldKeepProcessing1=false;
+
+
+                                        viewHolder.dupvote.setEnabled(true);
+                                        jobIsFinished=false;
+
+                                    }
+
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                                viewHolder.dupvote.setEnabled(true);
+                            }
+                        });
+
 
                     }
                 });
 
-                viewHolder.ddownvote.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        //TODO
-                        // implement downvote functionality
-                    }
-                });
+
 
 
             }
@@ -157,33 +252,57 @@ public class DescriptionViewer extends Fragment {
     public static class DescriptionViewHolder extends RecyclerView.ViewHolder{
 
         View mView;
-        Button dupvote;
-        Button ddownvote;
+        ImageButton dupvote;
+        TextView upvotestv;
+        TextView usernametv;
+        DatabaseReference likeDBR;
+        String userName="Husain";
+
+
 
         public DescriptionViewHolder(View itemView) {
             super(itemView);
             mView=itemView;
-             dupvote=(Button)mView.findViewById(R.id.dupvote);
-             ddownvote=(Button)mView.findViewById(R.id.ddownvote);
+            dupvote=(ImageButton)mView.findViewById(R.id.dupvote);
+            upvotestv= (TextView)mView.findViewById(R.id.dnumOfUpvotes);
+            usernametv=(TextView)mView.findViewById(R.id.dusername);
+
         }
         public void setDescriptionContent(String descriptionContent) {
             TextView descriptionContentTV= (TextView) mView.findViewById(R.id.ddescriptionContent);
             descriptionContentTV.setText(descriptionContent);
 
         }
+
         public void setUpvotes(int upvotes) {
-            TextView upvotestv= (TextView)mView.findViewById(R.id.dnumOfUpvotes);
             upvotestv.setText(String.valueOf(upvotes));
         }
-        public void setDownvotes(int downvotes) {
-            TextView downvotestvab=(TextView)mView.findViewById(R.id.dnumOfDownvotes);
-            downvotestvab.setText(String.valueOf(downvotes));
-        }
+
         public void setUserName(String username) {
-            TextView usernametv=(TextView)mView.findViewById(R.id.dusername);
             usernametv.setText(username);
         }
 
+        public void setLikeButton(final String post_key){
+            likeDBR=FirebaseDatabase.getInstance().getReference().child("LikedUsers").child("DescriptionUsers");
+            likeDBR.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.child(post_key).hasChild(userName)){
+                        dupvote.setImageResource(R.drawable.redthumb);
+
+
+                    }else {dupvote.setImageResource(R.drawable.whitethumb);}
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+
+
+        }
     }
 
 }
