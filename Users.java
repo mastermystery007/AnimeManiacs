@@ -53,7 +53,7 @@ public  class Users {
         Users.emailID = emailID;
     }
 
-    public  String getUserName() {
+    public  static  String getUserName() {
         return userName;
     }
 

@@ -29,6 +29,7 @@ public class Login extends AppCompatActivity {
 
     private Button mLoginButton;
 
+
     private FirebaseAuth mAuth;
     private DatabaseReference userDB;
     private String userId;
@@ -78,30 +79,29 @@ public class Login extends AppCompatActivity {
         String password = mPasswordField.getText().toString();
         final String userID=mAuth.getCurrentUser().getUid();
 
-            if(!TextUtils.isEmpty(email) || !TextUtils.isEmpty(password)){
-                userDB.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.hasChild(userID)){
-                            Intent i=new Intent(Login.this,MainActivity.class);
-                            startActivity(i);
+
+        if(TextUtils.isEmpty(email)||TextUtils.isEmpty(password)){
+
+            Toast.makeText(Login.this, "Fields are empty", Toast.LENGTH_LONG);
+
+        }else {
+            mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (!task.isSuccessful()) {
+                        Toast.makeText(Login.this, "Sign in Problem", Toast.LENGTH_LONG);
+                    }else{
+                        startActivity(new Intent(Login.this,MainActivity.class));}
+
+                }
+            });
 
 
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-
-
-
-    }
+        }
 
     }
+
+
 
     public void registerBtnClicked(View view) {
         Intent intent = new Intent(Login.this,Registration.class);

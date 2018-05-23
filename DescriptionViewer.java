@@ -27,7 +27,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import static com.doodlz.husain.animemaniacs.PredictionViewer.instance;
 
-public class DescriptionViewer extends Fragment implements Opinion {
+public class DescriptionViewer extends Fragment  {
 
     private RecyclerView descriptionViewerRV;
 

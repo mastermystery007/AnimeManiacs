@@ -24,12 +24,13 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 
 
-public class PredictionViewer extends Fragment implements Opinion {
+public class PredictionViewer extends Fragment {
 
     private RecyclerView pPredictionList;
 
@@ -99,19 +100,32 @@ public class PredictionViewer extends Fragment implements Opinion {
 
         submitpredButton.setOnClickListener(new View.OnClickListener() {
 
+
             @Override
             public void onClick(View v) {
 
+
                 String predContent=predText.getText().toString().trim();
                 Predictions prediction=new Predictions(0,predContent,0,userName);
-                pDatabase.push().setValue(prediction);
-                String userID= FirebaseAuth.getInstance().getCurrentUser().getUid().toString();
-                userDatabase.child(userID).setValue("prediction");
+                 String key = pDatabase.push().getKey();
+                 pDatabase.child(key).setValue(prediction);
 
-                predText.setText("");
-            }
-        });
 
+                Log.d("PredictionViewers","the key id is"+key);
+
+
+                   String userID= FirebaseAuth.getInstance().getCurrentUser().getUid().toString();
+
+
+                   userDatabase.child(userID).child("my_prediction_posts").child(key).child("anime").setValue(anime);
+
+                   userDatabase.child(userID).child("my_prediction_posts").child(key).child("range").setValue(range);
+
+                   predText.setText("");
+
+                    }
+
+                });
     }
 
 
@@ -166,7 +180,7 @@ public class PredictionViewer extends Fragment implements Opinion {
 
 
 
-                        pDatabase.addValueEventListener(new ValueEventListener() {
+                        pDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
 
 
                             @Override
@@ -301,7 +315,7 @@ public class PredictionViewer extends Fragment implements Opinion {
 
         public void setLikeButton(final String post_key){
             likeDBR=FirebaseDatabase.getInstance().getReference().child("LikedUsers").child("PredictionUsers");
-            likeDBR.addValueEventListener(new ValueEventListener() {
+            likeDBR.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if(dataSnapshot.child(post_key).hasChild(userName)){

@@ -73,13 +73,10 @@ public class MainActivity extends AppCompatActivity {
         mAnimeList.setAdapter(FBRA);
     }
 
-
-
-
-
-
-
-
+    public void upBtnClicked(View view) {
+        Intent i =new Intent(MainActivity.this,UserProfile.class);
+        startActivity(i);
+    }
 
 
     public static class AnimeViewHolder extends RecyclerView.ViewHolder{
