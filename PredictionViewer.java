@@ -78,7 +78,10 @@ public class PredictionViewer extends Fragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+
+
         super.onCreate(savedInstanceState);
+
 
             savedInstanceState=getArguments();
 
@@ -117,9 +120,11 @@ public class PredictionViewer extends Fragment {
                    String userID= FirebaseAuth.getInstance().getCurrentUser().getUid().toString();
 
 
-                   userDatabase.child(userID).child("my_prediction_posts").child(key).child("anime").setValue(anime);
+                userDatabase.child(userID).child("my_prediction_posts").child(key).child("downvotes").setValue(0);
+                userDatabase.child(userID).child("my_prediction_posts").child(key).child("predictionContent").setValue(predContent);
+                userDatabase.child(userID).child("my_prediction_posts").child(key).child("upvotes").setValue(0);
+                userDatabase.child(userID).child("my_prediction_posts").child(key).child("userName").setValue(userName);
 
-                   userDatabase.child(userID).child("my_prediction_posts").child(key).child("range").setValue(range);
 
                    predText.setText("");
 
@@ -259,6 +264,7 @@ public class PredictionViewer extends Fragment {
 
                     }
                 });
+
             }
         };
 

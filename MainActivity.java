@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,16 +24,26 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mAnimeList;
     private DatabaseReference mDatabase;
     private StorageReference mStorage;
+    private Button upbtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        upbtn=(Button) findViewById(R.id.upBtn);
 
         mAnimeList=(RecyclerView)findViewById(R.id.animeList);
 
         mAnimeList.setLayoutManager(new LinearLayoutManager(this));
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Animes");
+
+        upbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, UserProfile.class));
+
+            }
+        });
 
     }
     public void onStart(){
@@ -73,10 +84,7 @@ public class MainActivity extends AppCompatActivity {
         mAnimeList.setAdapter(FBRA);
     }
 
-    public void upBtnClicked(View view) {
-        Intent i =new Intent(MainActivity.this,UserProfile.class);
-        startActivity(i);
-    }
+
 
 
     public static class AnimeViewHolder extends RecyclerView.ViewHolder{
