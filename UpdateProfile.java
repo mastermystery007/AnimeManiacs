@@ -77,7 +77,7 @@ public class UpdateProfile extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent galleryIntent = new Intent();
-                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+                galleryIntent.setAction(Intent.ACTION_PICK);
                 galleryIntent.setType("image/*");
                 startActivityForResult(galleryIntent,GALLERY_REQUEST);
             }
@@ -118,9 +118,20 @@ public class UpdateProfile extends AppCompatActivity {
         {
             mImageUri = data.getData();
             profilePic.setImageURI(mImageUri);
-            StorageReference filepath = PPStorage.child(mImageUri.getLastPathSegment());
-            filepath.putFile(mImageUri);
-            mProgress.dismiss();
+            StorageReference filepath = PPStorage.child(FirebaseUserId);
+
+            filepath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                    Toast.makeText(getApplicationContext(),"Updated Profile Picture",Toast.LENGTH_LONG).show();
+
+                    userDetails.child("profilePicture").setValue(taskSnapshot.getDownloadUrl().toString());
+                    
+                    mProgress.dismiss();
+                }
+            });
+
 
 
         }
