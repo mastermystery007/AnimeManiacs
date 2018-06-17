@@ -30,20 +30,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        upbtn=(Button) findViewById(R.id.upBtn);
+
 
         mAnimeList=(RecyclerView)findViewById(R.id.animeList);
 
         mAnimeList.setLayoutManager(new LinearLayoutManager(this));
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Animes");
 
-        upbtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, UserProfile.class));
-
-            }
-        });
 
     }
     public void onStart(){

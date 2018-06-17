@@ -34,19 +34,20 @@ public class DescriptionViewer extends Fragment  {
     private DatabaseReference dDatabase,likedDatabase,userDatabase;
     private String anime;
     private String range;
-    private FirebaseUser firebaseUser;
+
+    private String FirebaseUser;
 
     Button submitDescriptionButton;
     EditText descText;
 
-    String userName="Husain";
+    String userName= Users.getUserName();
 
     static  DescriptionViewer instance;
 
 
     public static DescriptionViewer getInstance() {
-        if (instance == null) {
-            instance = new DescriptionViewer();
+        if (DescriptionViewer.instance == null) {
+            DescriptionViewer.instance = new DescriptionViewer();
         }
         return instance;
     }
@@ -91,7 +92,9 @@ public class DescriptionViewer extends Fragment  {
 
         dDatabase = FirebaseDatabase.getInstance().getReference().child("Description").child(anime).child(range);
 
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        FirebaseUser=FirebaseAuth.getInstance().getCurrentUser().getUid();
+
         submitDescriptionButton=(Button)getActivity().findViewById(R.id.submitBTN);
         descText=(EditText)getActivity().findViewById(R.id.commentET);
 
@@ -104,11 +107,20 @@ public class DescriptionViewer extends Fragment  {
             @Override
             public void onClick(View v) {
                 String descContent=descText.getText().toString().trim();
-                Description prediction=new Description(descContent,0,0,userName,anime);
-                dDatabase.push().setValue(prediction);
+                Description description =new Description(descContent,0,userName,anime,FirebaseUser);
+                //change downvotes with date and add uploaders Uid
+                String key = dDatabase.push().getKey();
+                dDatabase.child(key).setValue(description);
+
+
 
                 String userID= FirebaseAuth.getInstance().getCurrentUser().getUid().toString();
-                userDatabase.child(userID).setValue("prediction");
+
+
+                userDatabase.child(userID).child("my_posts").child(key).child("content").setValue(descContent);
+                userDatabase.child(userID).child("my_posts").child(key).child("upvotes").setValue(0);
+                userDatabase.child(userID).child("my_posts").child(key).child("userName").setValue(userName);
+                userDatabase.child(userID).child("my_posts").child(key).child("type").setValue("description");
 
                 descText.setText("");
             }
@@ -189,6 +201,8 @@ public class DescriptionViewer extends Fragment  {
 
                                         viewHolder.dupvote.setImageResource(R.drawable.whitethumb);
                                         likedDatabase.child(post_key).child(userName).removeValue();
+                                        //userdatabase mein add the upvotes
+                                        //TODO
 
 
 
@@ -277,6 +291,8 @@ public class DescriptionViewer extends Fragment  {
         public void setUpvotes(int upvotes) {
             upvotestv.setText(String.valueOf(upvotes));
         }
+
+
 
         public void setUserName(String username) {
             usernametv.setText(username);

@@ -43,7 +43,7 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("Login","the login is screwed");
+
         setContentView(R.layout.activity_login);
 
 
@@ -54,30 +54,45 @@ public class Login extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         userDB=FirebaseDatabase.getInstance().getReference().child("Users");
 
-
+         userId = mAuth.getCurrentUser().getUid();
+        Log.d("UserProfile"," "+userId);
 
 
         mLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 startSignIn();
-        }
+            }
         });
-
-
 
 
     }
     @Override
     protected void onStart() {
         super.onStart();
+
     }
 
     private void startSignIn() {
         String email = mEmailField.getText().toString();
         String password = mPasswordField.getText().toString();
-        final String userID=mAuth.getCurrentUser().getUid();
+
+        userDB.child(userId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Users.setUserName(dataSnapshot.child("userName").getValue().toString());
+                Users.setEmailID(dataSnapshot.child("emailId").getValue().toString());
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        Log.d("UserProfile"," "+Users.getUserName());
+        Log.d("UserProfile"," "+Users.getEmailID());
 
 
         if(TextUtils.isEmpty(email)||TextUtils.isEmpty(password)){
@@ -88,9 +103,9 @@ public class Login extends AppCompatActivity {
             mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (!task.isSuccessful()) {
-                        Toast.makeText(Login.this, "Sign in Problem", Toast.LENGTH_LONG);
-                    }else{
+                    if (task.isSuccessful()) {
+                        Toast.makeText(Login.this, "Good to go", Toast.LENGTH_LONG);
+
                         startActivity(new Intent(Login.this,MainActivity.class));}
 
                 }
@@ -107,4 +122,6 @@ public class Login extends AppCompatActivity {
         Intent intent = new Intent(Login.this,Registration.class);
         startActivity(intent);
     }
+
+
 }

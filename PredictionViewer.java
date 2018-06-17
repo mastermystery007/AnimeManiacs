@@ -38,10 +38,11 @@ public class PredictionViewer extends Fragment {
     private String anime;
     private String range;
     Button submitpredButton;
+    String FirebaseUser;
 
 
     EditText predText;
-    String userName="Husain";
+    String userName= Users.getUserName();
 
      static PredictionViewer instance;
 
@@ -94,12 +95,15 @@ public class PredictionViewer extends Fragment {
         submitpredButton= getActivity().findViewById(R.id.submitBTN);
         predText= getActivity().findViewById(R.id.commentET);
 
+
+
         pDatabase = FirebaseDatabase.getInstance().getReference().child("Predictions").child(anime).child(range);
 
         likedDatabase=FirebaseDatabase.getInstance().getReference().child("LikedUsers").child("PredictionUsers");
 
         userDatabase=FirebaseDatabase.getInstance().getReference().child("Users");
 
+        FirebaseUser=FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         submitpredButton.setOnClickListener(new View.OnClickListener() {
 
@@ -109,7 +113,7 @@ public class PredictionViewer extends Fragment {
 
 
                 String predContent=predText.getText().toString().trim();
-                Predictions prediction=new Predictions(0,predContent,0,userName);
+                Predictions prediction=new Predictions(FirebaseUser,predContent,0,userName);
                  String key = pDatabase.push().getKey();
                  pDatabase.child(key).setValue(prediction);
 
@@ -120,10 +124,11 @@ public class PredictionViewer extends Fragment {
                    String userID= FirebaseAuth.getInstance().getCurrentUser().getUid().toString();
 
 
-                userDatabase.child(userID).child("my_prediction_posts").child(key).child("downvotes").setValue(0);
-                userDatabase.child(userID).child("my_prediction_posts").child(key).child("predictionContent").setValue(predContent);
-                userDatabase.child(userID).child("my_prediction_posts").child(key).child("upvotes").setValue(0);
-                userDatabase.child(userID).child("my_prediction_posts").child(key).child("userName").setValue(userName);
+
+                userDatabase.child(userID).child("my_posts").child(key).child("content").setValue(predContent);
+                userDatabase.child(userID).child("my_posts").child(key).child("upvotes").setValue(0);
+                userDatabase.child(userID).child("my_posts").child(key).child("userName").setValue(userName);
+                userDatabase.child(userID).child("my_posts").child(key).child("type").setValue("prediction");
 
 
                    predText.setText("");
@@ -158,10 +163,12 @@ public class PredictionViewer extends Fragment {
             protected void populateViewHolder(final PredictionViewHolder viewHolder, final Predictions model, int position) {
 
                 final String post_key = getRef(position).getKey();
+                final String uploaderId= model.getUploaderId();
 
                 viewHolder.setPredictionContent(model.getPredictionContent());
                 viewHolder.setUserName(model.getUserName());
                 viewHolder.setUpvotes(model.getUpvotes());
+
                 viewHolder.setLikeButton(post_key);
 
                 Log.d("PredViewer"," "+model.showData());
@@ -187,7 +194,6 @@ public class PredictionViewer extends Fragment {
 
                         pDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
 
-
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 if(shouldKeepProcessing2){
@@ -195,7 +201,7 @@ public class PredictionViewer extends Fragment {
                                   realUpvotesInt=Integer.parseInt(realUpvotes);
                                   shouldKeepProcessing2=false;
                                   jobIsFinished=true;
-                                    Log.d("PredViewer"," data has changed");
+                                    Log.d("PredViewer"," getting number of likes");
                                 }
                             }
 
@@ -210,21 +216,26 @@ public class PredictionViewer extends Fragment {
                          @Override
                          public void onDataChange(DataSnapshot dataSnapshot) {
                              if (shouldKeepProcessing1 && jobIsFinished) {
-                                 if ( dataSnapshot.child(post_key).hasChild(userName)) {
+                                 if ( dataSnapshot.child(post_key).hasChild(FirebaseUser)) {
+
+                                     shouldKeepProcessing1=false;
+                                     jobIsFinished=false;
 
                                      viewHolder.pUpvote.setImageResource(R.drawable.whitethumb);
-                                     likedDatabase.child(post_key).child(userName).removeValue();
+                                     likedDatabase.child(post_key).child(FirebaseUser).removeValue();
 
 
 
                                      numUpvotesint=realUpvotesInt-1;
+
                                      viewHolder.setUpvotes(numUpvotesint);
                                      pDatabase.child(post_key).child("upvotes").setValue(numUpvotesint);
+                                     userDatabase.child(uploaderId).child("my_posts").child(post_key).child("upvotes").setValue(numUpvotesint);
+                                     Log.d("PredViewer"," Uid"+uploaderId);
+
 
 
                                      viewHolder.pUpvote.setEnabled(true);
-                                     shouldKeepProcessing1=false;
-                                     jobIsFinished=false;
 
                                      Log.d("PredViewer"," data changed");
 
@@ -232,7 +243,7 @@ public class PredictionViewer extends Fragment {
                                  }
                                  else {
 
-                                     likedDatabase.child(post_key).child(userName).setValue("liked");
+                                     likedDatabase.child(post_key).child(FirebaseUser).setValue("liked");
 
 
                                      viewHolder.pUpvote.setImageResource(R.drawable.redthumb);
@@ -241,6 +252,8 @@ public class PredictionViewer extends Fragment {
                                      viewHolder.setUpvotes(numUpvotesint);
 
                                      pDatabase.child(post_key).child("upvotes").setValue(numUpvotesint);
+                                     userDatabase.child(uploaderId).child("my_posts").child(post_key).child("upvotes").setValue(numUpvotesint);
+
                                      shouldKeepProcessing1=false;
 
 
@@ -294,7 +307,8 @@ public class PredictionViewer extends Fragment {
         TextView upvotestv;
         TextView predictionContenttv;
         TextView usernametv;
-        String userName="Husain";
+        String userName = Users.getUserName();
+        String FirebaseUser=FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         public PredictionViewHolder(View itemView) {
             super(itemView);
@@ -310,6 +324,9 @@ public class PredictionViewer extends Fragment {
         public void setPredictionContent(String predictionContent) {
             predictionContenttv.setText(predictionContent);
         }
+
+
+
         public void setUpvotes(int upvotes) {
             upvotestv.setText(String.valueOf(upvotes));
             Log.d("upvotes",String.valueOf(upvotes));
@@ -324,7 +341,7 @@ public class PredictionViewer extends Fragment {
             likeDBR.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.child(post_key).hasChild(userName)){
+                    if(dataSnapshot.child(post_key).hasChild(FirebaseUser)){
                         pUpvote.setImageResource(R.drawable.redthumb);
 
 

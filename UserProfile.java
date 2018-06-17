@@ -1,23 +1,17 @@
 package com.doodlz.husain.animemaniacs;
 
+import android.content.Intent;
 import android.os.Bundle;
-
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 
 
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,16 +19,18 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 
 public class UserProfile extends AppCompatActivity {
     private String FirebaseUser;
-    private DatabaseReference postDBR,MyPreds,likedDatabase,pDatabase;
+    private DatabaseReference postDBR;
     private String profile_pic;
-    private String bio;
-    private String userName;
+
+    private  TextView biotv,usernametv;
+    Button editProfile;
+
+
     private RecyclerView RV;
 
 
@@ -43,21 +39,30 @@ public class UserProfile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
 
+
         RV=(RecyclerView)findViewById(R.id.userProfileRV);
+        RV.setHasFixedSize(true);
+
+        RV.setLayoutManager(new LinearLayoutManager(this));
         Log.d("UserProfile"," reached stage 0");
 
+        biotv=(TextView)findViewById(R.id.BioTV);
+        usernametv=(TextView)findViewById(R.id.UPusernameTV) ;
+
         FirebaseUser= FirebaseAuth.getInstance().getCurrentUser().getUid();
+        editProfile=(Button)findViewById(R.id.editProfile);
 
-        postDBR= FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseUser).child("my_prediction_posts");
-
-        MyPreds=FirebaseDatabase.getInstance().getReference().child("Predictions");
-
-        pDatabase = FirebaseDatabase.getInstance().getReference().child("Predictions").child("Naruto").child("0-30");
+        postDBR = FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseUser).child("my_posts");
 
 
 
-        likedDatabase=FirebaseDatabase.getInstance().getReference().child("LikedUsers").child("PredictionUsers");
-
+        editProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(UserProfile.this,UpdateProfile.class);
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -65,98 +70,90 @@ public class UserProfile extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        biotv.setText(Users.getBio());
+        usernametv.setText(Users.getUserName());
+
         Log.d("UserProfile"," reached stage 1");
 
-        FirebaseRecyclerAdapter<Predictions,PredictionViewHolder> FBRA =new FirebaseRecyclerAdapter<Predictions,PredictionViewHolder>(
+        FirebaseRecyclerAdapter<UPopinion,UPOpinionHolder> FBRA =new FirebaseRecyclerAdapter<UPopinion,UPOpinionHolder>(
 
 
-                Predictions.class,
-                R.layout.prediction_overlay,
-                PredictionViewHolder.class,
+                UPopinion.class,
+                R.layout.user_profile_overlay,
+                UPOpinionHolder.class,
                 postDBR
-
         ){
 
 
             @Override
-            protected void populateViewHolder(PredictionViewHolder viewHolder, Predictions model, int position) {
+            protected void populateViewHolder(final UPOpinionHolder viewHolder,final UPopinion model, int position) {
                 Log.d("UserProfile","running in UP populateViewHolder");
+                final String post_key = getRef(position).getKey();
+
+
+
+                viewHolder.setUserName(model.getUserName());
+                viewHolder.setContent(model.getContent());
+                viewHolder.setUpvotes(model.getUpvotes());
+                viewHolder.setType(model.getType());
+                Log.d("UserPYo","the details are:"+model.getContent()+model.getContent()+model.getUpvotes()+model.getType());
             }
 
             @Override
-            public void onBindViewHolder(PredictionViewHolder viewHolder, int position) {
+            public void onBindViewHolder(UPOpinionHolder viewHolder, int position) {
                 super.onBindViewHolder(viewHolder, position);
-
-                Log.d("UserProfile","running in UP onBind");
-
             }
         };
 
         RV.setAdapter(FBRA);
     }
 
-    public static class PredictionViewHolder extends RecyclerView.ViewHolder {
+    public void editProfileClicked(View view) {
+        Intent intent = new Intent(UserProfile.this,UpdateProfile.class);
+        startActivity(intent);
+    }
+
+
+    public static class UPOpinionHolder extends RecyclerView.ViewHolder {
 
         View mView;
-        ImageButton pUpvote;
-        DatabaseReference likeDBR;
+
 
         TextView upvotestv;
-        TextView predictionContenttv;
+        TextView contenttv;
         TextView usernametv;
-        String userName = "Husain";
+        TextView type;
 
-        public PredictionViewHolder(View itemView) {
+
+        public UPOpinionHolder(View itemView) {
+
             super(itemView);
             mView = itemView;
 
-            pUpvote = mView.findViewById(R.id.pupvote);
-
-            upvotestv = mView.findViewById(R.id.numOfUpvotes);
-            predictionContenttv = mView.findViewById(R.id.predictionContent);
-
-            usernametv = mView.findViewById(R.id.username);
+            upvotestv = mView.findViewById(R.id.UPnumOfUpvotes);
+            contenttv = mView.findViewById(R.id.UPcommentcontent);
+            usernametv = mView.findViewById(R.id.UPusername);
+            type=mView.findViewById(R.id.UPtype);
         }
 
-        public void setPredictionContent(String predictionContent) {
-            predictionContenttv.setText(predictionContent);
+        public void setContent(String Content) {
+            contenttv.setText(Content);
         }
 
         public void setUpvotes(int upvotes) {
             upvotestv.setText(String.valueOf(upvotes));
-            Log.d("upvotes", String.valueOf(upvotes));
         }
 
-        public void showLikedButton(int visibility) {
-            pUpvote.setVisibility(visibility);
-        }
+
+        public void setType(String type0){
+            type.setText(type0);}
 
         public void setUserName(String username) {
             usernametv.setText(username);
         }
 
-        public void setLikeButton(final String post_key) {
-            likeDBR = FirebaseDatabase.getInstance().getReference().child("LikedUsers").child("PredictionUsers");
-            likeDBR.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.child(post_key).hasChild(userName)) {
-                        pUpvote.setImageResource(R.drawable.redthumb);
 
 
-                    } else {
-                        pUpvote.setImageResource(R.drawable.whitethumb);
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-
-
-        }
 
     }
 }

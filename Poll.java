@@ -1,5 +1,7 @@
 package com.doodlz.husain.animemaniacs;
 
+import android.util.Log;
+
 /**
  * Created by husain on 08-02-2018.
  */
@@ -120,5 +122,9 @@ public class Poll {
 
     public void setOp4votes(int op4votes) {
         this.op4votes = op4votes;
+    }
+
+    public void getDetails(){
+        Log.d("ViewPollBoiz","data of poll is"+this.getOption1()+this.getOption2()+this.getOption3()+this.getOption4());
     }
 }

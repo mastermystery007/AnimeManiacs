@@ -64,6 +64,15 @@ public class AnimeRangeList extends AppCompatActivity {
         mAnimeRangeList.setAdapter(FBRA);
     }
 
+    public void userProfile(View view) {
+        startActivity(new Intent(AnimeRangeList.this,UserProfile.class));
+    }
+
+    public void pollButtonClicked(View view) {
+        startActivity(new Intent(AnimeRangeList.this,ViewPoll.class));
+    }
+
+
     public static class ChapterRangeViewHolder extends RecyclerView.ViewHolder{
 
 

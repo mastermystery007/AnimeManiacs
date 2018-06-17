@@ -9,16 +9,17 @@ import java.sql.Time;
 public class Predictions {
 
     String predictionContent;
-    int upvotes, downvotes;
+    int upvotes;
     String userName;
     String anime;
+    String uploaderId;
 
 
     public Predictions() {}
 
 
-    public Predictions(int downvotes,String predictionContent, int upvotes, String userName) {
-        this.downvotes=downvotes;
+    public Predictions(String uploaderId,String predictionContent, int upvotes, String userName) {
+        this.uploaderId=uploaderId;
         this.upvotes=upvotes;
         this.predictionContent=predictionContent;
         this.userName=userName;
@@ -40,13 +41,7 @@ public class Predictions {
         this.upvotes = upvotes;
     }
 
-    public int getDownvotes() {
-        return downvotes;
-    }
 
-    public void setDownvotes(int downvotes) {
-        this.downvotes = downvotes;
-    }
 
     public String getUserName() {
         return userName;
@@ -64,9 +59,16 @@ public class Predictions {
     }
 
 
+    public String getUploaderId() {
+        return uploaderId;
+    }
+
+    public void setUploaderId(String uploaderId) {
+        this.uploaderId = uploaderId;
+    }
 
     public String showData(){
-        return this.predictionContent+" "+this.upvotes+" "+this.downvotes+" "+this.userName;
+        return this.predictionContent+" "+this.upvotes+" "+this.uploaderId+" "+this.userName;
 
     }
 

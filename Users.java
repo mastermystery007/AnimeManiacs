@@ -57,8 +57,8 @@ public  class Users {
         return userName;
     }
 
-    public static void setUserName(String userName) {
-        userName = userName;
+    public static void setUserName(String userNamee) {
+        userName = userNamee;
     }
 
 
@@ -68,7 +68,7 @@ public  class Users {
         return bio;
     }
 
-    public static void setBio(String bio) {bio = bio;}
+    public static void setBio(String bioo) {bio = bioo;}
 
 
 

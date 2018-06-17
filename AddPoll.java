@@ -12,10 +12,10 @@ import com.google.firebase.database.FirebaseDatabase;
 public class AddPoll extends AppCompatActivity {
 
    private FirebaseDatabase sFirebaseDatabase;
-   private EditText pollQuestiontv,option1tv,option2tv,option3tv,option4tv;
-   private Button addPollbutton;
+   private EditText pollQuestiontv,option1tv,option2tv,option3tv,option4tv,animeNametv;
+
    DatabaseReference sDatabaseReference;
-   String userName="Husain Mistry",animeName="Naruto";
+   String userName=Users.getUserName();
 
 
 
@@ -29,9 +29,10 @@ public class AddPoll extends AppCompatActivity {
         option2tv=(EditText)findViewById(R.id.option2);
         option3tv=(EditText)findViewById(R.id.option3);
         option4tv=(EditText)findViewById(R.id.option4);
-        addPollbutton=(Button)findViewById(R.id.addPoll);
+        animeNametv=(EditText)findViewById(R.id.animeName);
+
         sFirebaseDatabase=FirebaseDatabase.getInstance();
-        sDatabaseReference=sFirebaseDatabase.getReference("Poll");
+        sDatabaseReference=sFirebaseDatabase.getInstance().getReference("Poll");
 
 
     }
@@ -42,8 +43,9 @@ public class AddPoll extends AppCompatActivity {
         String option2= option2tv.getText().toString().trim();
         String option3= option3tv.getText().toString().trim();
         String option4= option4tv.getText().toString().trim();
+        String animeName=animeNametv.getText().toString().trim();
 
-        Poll userPoll=new Poll(pollQuestion,animeName,userName,option1,option2,option3,option4,0,0,0,0);
+        Poll userPoll= new Poll(pollQuestion,animeName,userName,option1,option2,option3,option4,0,0,0,0);
         sDatabaseReference.push().setValue(userPoll);
     }
 }

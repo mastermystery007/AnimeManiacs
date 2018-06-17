@@ -84,8 +84,8 @@ public class Registration extends AppCompatActivity {
                     String emailId=emailRegistrationET.getText().toString();
 
 
-                    userCreate.child(userID).child("user_name").setValue(userName);
-                    userCreate.child(userID).child("email-id").setValue(emailId);
+                    userCreate.child(userID).child("userName").setValue(userName);
+                    userCreate.child(userID).child("emailId").setValue(emailId);
 
                     progressDialog.dismiss();
 
@@ -103,10 +103,4 @@ public class Registration extends AppCompatActivity {
     }
 
 
-    public void pushBtnClicked(View view) {
-
-
-
-
-    }
 }

@@ -6,17 +6,18 @@ package com.doodlz.husain.animemaniacs;
 
 public class Description {
     String descriptionContent;
-    int upvotes, downvotes;
+    int upvotes;
     String userName;
     String anime;
+    String uploaderId;
 
     public Description(){}
 
 
-    public Description(String descriptionContent, int upvotes, int downvotes, String userName, String anime) {
+    public Description(String descriptionContent, int upvotes, String userName, String anime,String uploaderId) {
         this.descriptionContent = descriptionContent;
         this.upvotes = upvotes;
-        this.downvotes = downvotes;
+        this.uploaderId= uploaderId;
         this.userName = userName;
         this.anime = anime;
     }
@@ -36,13 +37,6 @@ public class Description {
         this.upvotes = upvotes;
     }
 
-    public int getDownvotes() {
-        return downvotes;
-    }
-
-    public void setDownvotes(int downvotes) {
-        this.downvotes = downvotes;
-    }
 
     public String getUserName() {
         return userName;
@@ -58,5 +52,13 @@ public class Description {
 
     public void setAnime(String anime) {
         this.anime = anime;
+    }
+
+    public String getUploaderId() {
+        return uploaderId;
+    }
+
+    public void setUploaderId(String uploaderId) {
+        this.uploaderId = uploaderId;
     }
 }
