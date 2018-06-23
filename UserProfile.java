@@ -55,6 +55,10 @@ public class UserProfile extends AppCompatActivity {
         postDBR = FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseUser).child("my_posts");
 
 
+        biotv.setText(Users.getBio());
+        usernametv.setText(Users.getUserName());
+
+
 
         editProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,8 +74,7 @@ public class UserProfile extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        biotv.setText(Users.getBio());
-        usernametv.setText(Users.getUserName());
+
 
         Log.d("UserProfile"," reached stage 1");
 

@@ -35,6 +35,7 @@ public class Login extends AppCompatActivity {
     private String userId;
     Users user;
 
+    private FirebaseAuth.AuthStateListener mAuthListener;
 
 
 
@@ -54,8 +55,50 @@ public class Login extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         userDB=FirebaseDatabase.getInstance().getReference().child("Users");
 
-         userId = mAuth.getCurrentUser().getUid();
-        Log.d("UserProfile"," "+userId);
+
+        Log.d("Loginss"," "+userId);
+
+
+
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+
+
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    userId = mAuth.getCurrentUser().getUid();
+
+                    userDB.child(userId).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Users.setUserName(dataSnapshot.child("userName").getValue().toString());
+                            Users.setEmailID(dataSnapshot.child("emailId").getValue().toString());
+                            Users.setProfilePicture(dataSnapshot.child("profilePicture").getValue().toString());
+                            //Users.setBio(dataSnapshot.child("bio").getValue().toString());
+
+                            Log.d("Loginss"," "+Users.getUserName());
+                            Log.d("Loginss"," "+Users.getEmailID());
+                            Log.d("Loginss"," "+Users.getProfilePicture());
+
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    startActivity(new Intent(Login.this,MainActivity.class));
+                    finish();
+                }
+
+
+
+                }
+            };
+
 
 
         mLoginButton.setOnClickListener(new View.OnClickListener() {
@@ -70,29 +113,14 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+
 
     }
 
     private void startSignIn() {
         String email = mEmailField.getText().toString();
         String password = mPasswordField.getText().toString();
-
-        userDB.child(userId).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Users.setUserName(dataSnapshot.child("userName").getValue().toString());
-                Users.setEmailID(dataSnapshot.child("emailId").getValue().toString());
-
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        Log.d("UserProfile"," "+Users.getUserName());
-        Log.d("UserProfile"," "+Users.getEmailID());
 
 
         if(TextUtils.isEmpty(email)||TextUtils.isEmpty(password)){
@@ -104,9 +132,39 @@ public class Login extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
-                        Toast.makeText(Login.this, "Good to go", Toast.LENGTH_LONG);
+
+                        userId = mAuth.getCurrentUser().getUid();
+
+                        userDB.child(userId).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                Users.setUserName(dataSnapshot.child("userName").getValue().toString());
+                                Users.setEmailID(dataSnapshot.child("emailId").getValue().toString());
+                                Users.setProfilePicture(dataSnapshot.child("profilePicture").getValue().toString());
+                                Users.setBio(dataSnapshot.child("bio").getValue().toString());
+
+                                Log.d("Loginss"," "+Users.getUserName());
+                                Log.d("Loginss"," "+Users.getEmailID());
+                                Log.d("Loginss"," "+Users.getProfilePicture());
+
+
+                                finish();
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                        Toast.makeText(Login.this, "Good to go", Toast.LENGTH_LONG).show();
 
                         startActivity(new Intent(Login.this,MainActivity.class));}
+                        else{
+
+                        Toast.makeText(Login.this, "No just No", Toast.LENGTH_LONG).show();
+
+
+                    }
 
                 }
             });
@@ -114,14 +172,11 @@ public class Login extends AppCompatActivity {
 
         }
 
+
     }
-
-
-
-    public void registerBtnClicked(View view) {
+    public void gotoRegister(View view) {
         Intent intent = new Intent(Login.this,Registration.class);
         startActivity(intent);
+        finish();
     }
-
-
 }

@@ -78,6 +78,7 @@ public class Registration extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
                     Toast.makeText(Registration.this,"Registered Successfully",Toast.LENGTH_SHORT).show();
+                    Log.d("Registrationss","Working");
 
                     String userName=userNameET.getText().toString();
                     String userID=firebaseAuth.getCurrentUser().getUid();
@@ -86,8 +87,15 @@ public class Registration extends AppCompatActivity {
 
                     userCreate.child(userID).child("userName").setValue(userName);
                     userCreate.child(userID).child("emailId").setValue(emailId);
+                    userCreate.child(userID).child("profilePicture").setValue("nulla");
+
+
 
                     progressDialog.dismiss();
+
+                    Intent intent = new Intent(Registration.this,Login.class);
+                    startActivity(intent);
+                    finish();
 
 
                 }else{ Toast.makeText(Registration.this,"Could not Register",Toast.LENGTH_SHORT).show();}
@@ -97,10 +105,8 @@ public class Registration extends AppCompatActivity {
 
     }
 
-    public void loginBtnClicked(View view) {
-        Intent i=new Intent(getApplicationContext(),Login.class);
-        startActivity(i);
+
+    public void gotoLogin(View view) {
+        startActivity(new Intent(Registration.this,Login.class));
     }
-
-
 }

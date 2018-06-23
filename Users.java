@@ -40,6 +40,7 @@ public  class Users {
         this.setProfilePicture(profilePicture);
         this.setBio(bio);
         this.setEmailID(emailID);
+
     }
 
 
@@ -77,7 +78,7 @@ public  class Users {
         return profilePicture;
     }
 
-    public static void setProfilePicture(String profilePicture) {
-        profilePicture = profilePicture;
+    public static void setProfilePicture(String profilePicturee) {
+        profilePicture = profilePicturee;
     }
 }

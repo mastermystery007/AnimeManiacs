@@ -4,27 +4,28 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.TextView;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 
 public class UpdateProfile extends AppCompatActivity {
@@ -35,7 +36,8 @@ public class UpdateProfile extends AppCompatActivity {
     StorageReference PPStorage;
     Button updateProfile;
     String FirebaseUserId;
-    ImageButton profilePic;
+    ImageView profilePic;
+    @Nullable String profilePicture;
 
 
      private Uri mImageUri=null;
@@ -55,8 +57,14 @@ public class UpdateProfile extends AppCompatActivity {
         FirebaseUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         mProgress=new ProgressDialog(this);
         updateProfile=(Button)findViewById(R.id.updateProfile);
-        profilePic=(ImageButton)findViewById(R.id.profilepicIB);
+        profilePic=(ImageView) findViewById(R.id.profilePictureImageViewUpdateProfile);
+        profilePicture=Users.getProfilePicture();
 
+        Log.d("UpdateProfiless","the profilePic is "+profilePicture);
+        if(profilePicture.equals("null")) {
+            Picasso.get().load(profilePicture).into(profilePic);
+
+        }else{profilePic.setImageResource(R.drawable.profilepic);}
     }
 
 
@@ -64,6 +72,11 @@ public class UpdateProfile extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        biotv.setText(Users.getBio());
+
+        usernametv.setText(Users.getUserName());
+
 
 
         updateProfile.setOnClickListener(new View.OnClickListener() {
@@ -80,6 +93,8 @@ public class UpdateProfile extends AppCompatActivity {
                 galleryIntent.setAction(Intent.ACTION_PICK);
                 galleryIntent.setType("image/*");
                 startActivityForResult(galleryIntent,GALLERY_REQUEST);
+                mProgress.setMessage("Uploading Photo...");
+                mProgress.show();
             }
         });
     }
@@ -96,12 +111,14 @@ public class UpdateProfile extends AppCompatActivity {
 
 
         if(!TextUtils.isEmpty(userName)){
-            mProgress.setMessage("Updating proile...");
+            mProgress.setMessage("Updating profile...");
             mProgress.show();
             userDetails.child(FirebaseUserId).child("userName").setValue(userName);
             userDetails.child(FirebaseUserId).child("bio").setValue(bio);
             Users.setUserName(userName);
             Users.setBio(bio);
+
+            mProgress.dismiss();
         }else {
             Toast.makeText(getApplicationContext(),"Username Field Cannot Be Empty",Toast.LENGTH_LONG);
 
@@ -116,9 +133,8 @@ public class UpdateProfile extends AppCompatActivity {
 
         if(requestCode == GALLERY_REQUEST && resultCode == RESULT_OK)
         {
-            mImageUri = data.getData();
-            profilePic.setImageURI(mImageUri);
-            StorageReference filepath = PPStorage.child(FirebaseUserId);
+           mImageUri=data.getData();
+           StorageReference filepath = PPStorage.child(FirebaseUserId);
 
             filepath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -126,8 +142,10 @@ public class UpdateProfile extends AppCompatActivity {
 
                     Toast.makeText(getApplicationContext(),"Updated Profile Picture",Toast.LENGTH_LONG).show();
 
-                    userDetails.child("profilePicture").setValue(taskSnapshot.getDownloadUrl().toString());
-                    
+                    userDetails.child(FirebaseUserId).child("profilePicture").setValue(taskSnapshot.getDownloadUrl().toString());
+
+                    profilePic.setImageURI(mImageUri);
+
                     mProgress.dismiss();
                 }
             });
@@ -135,5 +153,15 @@ public class UpdateProfile extends AppCompatActivity {
 
 
         }
+        else{
+            mProgress.dismiss();
+
+            Toast.makeText(getApplicationContext(),"Failed to Update Profile Picture",Toast.LENGTH_LONG).show();
+
+
+        }
+
     }
+
+
 }
