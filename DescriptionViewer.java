@@ -1,5 +1,6 @@
 package com.doodlz.husain.animemaniacs;
 
+import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -156,6 +157,13 @@ public class DescriptionViewer extends Fragment  {
 
                 viewHolder.setUserName(model.getUserName());
 
+                viewHolder.descComment.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivity(new Intent(getContext(),DescComments.class));
+                    }
+                });
+
                 viewHolder.dupvote.setOnClickListener(new View.OnClickListener() {
 
                     boolean shouldKeepProcessing1=false;
@@ -267,6 +275,7 @@ public class DescriptionViewer extends Fragment  {
 
         View mView;
         ImageButton dupvote;
+        ImageButton descComment;
         TextView upvotestv;
         TextView usernametv;
         DatabaseReference likeDBR;
@@ -280,6 +289,7 @@ public class DescriptionViewer extends Fragment  {
             dupvote=(ImageButton)mView.findViewById(R.id.dupvote);
             upvotestv= (TextView)mView.findViewById(R.id.dnumOfUpvotes);
             usernametv=(TextView)mView.findViewById(R.id.dusername);
+            descComment=(ImageButton)mView.findViewById(R.id.descComment);
 
         }
         public void setDescriptionContent(String descriptionContent) {

@@ -87,7 +87,8 @@ public class Registration extends AppCompatActivity {
 
                     userCreate.child(userID).child("userName").setValue(userName);
                     userCreate.child(userID).child("emailId").setValue(emailId);
-                    userCreate.child(userID).child("profilePicture").setValue("nulla");
+                    userCreate.child(userID).child("profilePicture").setValue("null");
+                    userCreate.child(userID).child("bio").setValue("Man On A Mission");
 
 
 

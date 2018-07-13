@@ -3,6 +3,7 @@ package com.doodlz.husain.animemaniacs;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -76,10 +77,12 @@ public class Login extends AppCompatActivity {
                             Users.setEmailID(dataSnapshot.child("emailId").getValue().toString());
                             Users.setProfilePicture(dataSnapshot.child("profilePicture").getValue().toString());
                             //Users.setBio(dataSnapshot.child("bio").getValue().toString());
+                            //Users.setBio(dataSnapshot.child("bio").getValue().toString());
 
                             Log.d("Loginss"," "+Users.getUserName());
                             Log.d("Loginss"," "+Users.getEmailID());
                             Log.d("Loginss"," "+Users.getProfilePicture());
+
 
 
                         }

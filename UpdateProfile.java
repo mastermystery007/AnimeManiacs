@@ -36,6 +36,7 @@ public class UpdateProfile extends AppCompatActivity {
     StorageReference PPStorage;
     Button updateProfile;
     String FirebaseUserId;
+    String biography;
     ImageView profilePic;
     @Nullable String profilePicture;
 
@@ -49,6 +50,7 @@ public class UpdateProfile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_profile);
 
+
         biotv=(EditText) findViewById(R.id.bioet);
         usernametv=(EditText)findViewById(R.id.usernameet);
 
@@ -61,7 +63,7 @@ public class UpdateProfile extends AppCompatActivity {
         profilePicture=Users.getProfilePicture();
 
         Log.d("UpdateProfiless","the profilePic is "+profilePicture);
-        if(profilePicture.equals("null")) {
+        if(!profilePicture.equals("null")) {
             Picasso.get().load(profilePicture).into(profilePic);
 
         }else{profilePic.setImageResource(R.drawable.profilepic);}
@@ -94,7 +96,7 @@ public class UpdateProfile extends AppCompatActivity {
                 galleryIntent.setType("image/*");
                 startActivityForResult(galleryIntent,GALLERY_REQUEST);
                 mProgress.setMessage("Uploading Photo...");
-                mProgress.show();
+
             }
         });
     }
@@ -105,8 +107,8 @@ public class UpdateProfile extends AppCompatActivity {
 
         Log.d("yes" ,
                 "boiz");
-        final String bio=biotv.getText().toString();
-        final String userName=usernametv.getText().toString();
+        final String bio = biotv.getText().toString();
+        final String userName = usernametv.getText().toString();
 
 
 
@@ -115,10 +117,17 @@ public class UpdateProfile extends AppCompatActivity {
             mProgress.show();
             userDetails.child(FirebaseUserId).child("userName").setValue(userName);
             userDetails.child(FirebaseUserId).child("bio").setValue(bio);
-            Users.setUserName(userName);
             Users.setBio(bio);
+            Users.setUserName(userName);
+
 
             mProgress.dismiss();
+
+            Intent intent = new Intent(UpdateProfile.this,UserProfile.class);
+            startActivity(intent);
+            finish();
+
+
         }else {
             Toast.makeText(getApplicationContext(),"Username Field Cannot Be Empty",Toast.LENGTH_LONG);
 
@@ -133,6 +142,7 @@ public class UpdateProfile extends AppCompatActivity {
 
         if(requestCode == GALLERY_REQUEST && resultCode == RESULT_OK)
         {
+            mProgress.show();
            mImageUri=data.getData();
            StorageReference filepath = PPStorage.child(FirebaseUserId);
 
@@ -143,6 +153,8 @@ public class UpdateProfile extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(),"Updated Profile Picture",Toast.LENGTH_LONG).show();
 
                     userDetails.child(FirebaseUserId).child("profilePicture").setValue(taskSnapshot.getDownloadUrl().toString());
+
+                    Users.setProfilePicture(taskSnapshot.getDownloadUrl().toString());
 
                     profilePic.setImageURI(mImageUri);
 

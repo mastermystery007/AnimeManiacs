@@ -19,6 +19,15 @@ public class PredDescViewer extends AppCompatActivity {
 
 
 
+
+
+
+
+
+
+
+
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 

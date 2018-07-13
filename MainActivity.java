@@ -113,6 +113,9 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
+    public void pollingClicked(MenuItem item) {
+    }
+
 
     public static class AnimeViewHolder extends RecyclerView.ViewHolder{
 

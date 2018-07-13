@@ -2,6 +2,7 @@ package com.doodlz.husain.animemaniacs;
 
 
 
+import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -173,6 +174,14 @@ public class PredictionViewer extends Fragment {
 
                 Log.d("PredViewer"," "+model.showData());
 
+                viewHolder.predComment.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivity(new Intent(getContext(),PredComments.class));
+
+                    }
+                });
+
                 viewHolder.pUpvote.setOnClickListener(new View.OnClickListener() {
                     boolean shouldKeepProcessing1=false;
                     boolean shouldKeepProcessing2= false;
@@ -192,8 +201,7 @@ public class PredictionViewer extends Fragment {
 
 
 
-                        pDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-
+                        pDatabase.addListenerForSingleValueEvent(new ValueEventListener(){
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 if(shouldKeepProcessing2){
@@ -302,6 +310,7 @@ public class PredictionViewer extends Fragment {
 
         View mView;
         ImageButton pUpvote;
+        ImageButton predComment;
         DatabaseReference likeDBR;
 
         TextView upvotestv;
@@ -315,7 +324,7 @@ public class PredictionViewer extends Fragment {
             mView=itemView;
 
             pUpvote= mView.findViewById(R.id.pupvote);
-
+            predComment=(ImageButton)mView.findViewById(R.id.predComment);
             upvotestv= mView.findViewById(R.id.numOfUpvotes);
             predictionContenttv= mView.findViewById(R.id.predictionContent);
 

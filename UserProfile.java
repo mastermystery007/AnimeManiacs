@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -20,6 +21,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 
 public class UserProfile extends AppCompatActivity {
@@ -27,8 +29,10 @@ public class UserProfile extends AppCompatActivity {
     private DatabaseReference postDBR;
     private String profile_pic;
 
+    private ImageView profilePicIV;
+
     private  TextView biotv,usernametv;
-    Button editProfile;
+    TextView editProfile;
 
 
     private RecyclerView RV;
@@ -48,9 +52,10 @@ public class UserProfile extends AppCompatActivity {
 
         biotv=(TextView)findViewById(R.id.BioTV);
         usernametv=(TextView)findViewById(R.id.UPusernameTV) ;
+        profilePicIV=(ImageView)findViewById(R.id.ProfilePicIV);
 
         FirebaseUser= FirebaseAuth.getInstance().getCurrentUser().getUid();
-        editProfile=(Button)findViewById(R.id.editProfile);
+        editProfile=(TextView) findViewById(R.id.editProfile);
 
         postDBR = FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseUser).child("my_posts");
 
@@ -75,8 +80,11 @@ public class UserProfile extends AppCompatActivity {
         super.onStart();
 
 
+        if(!Users.getProfilePicture().equals("null")){
+            Picasso.get().load(Users.getProfilePicture()).into(profilePicIV);
+        }
 
-        Log.d("UserProfile"," reached stage 1");
+
 
         FirebaseRecyclerAdapter<UPopinion,UPOpinionHolder> FBRA =new FirebaseRecyclerAdapter<UPopinion,UPOpinionHolder>(
 
@@ -111,10 +119,7 @@ public class UserProfile extends AppCompatActivity {
         RV.setAdapter(FBRA);
     }
 
-    public void editProfileClicked(View view) {
-        Intent intent = new Intent(UserProfile.this,UpdateProfile.class);
-        startActivity(intent);
-    }
+
 
 
     public static class UPOpinionHolder extends RecyclerView.ViewHolder {
